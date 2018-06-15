@@ -4,7 +4,7 @@ var location = '동작구';
 
 // Request URL
 var url = 'http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/getMsrstnAcctoRltmMesureDnsty';
-var queryParams = '?' + encodeURIComponent('ServiceKey') + '=LQEeedADdiA6byfN6ia7PA%2FumVSCjlSD2fcAPmEOEBraTeuxFXxN8jlKHnCvy%2Bqswni1rTf0q6hYmBapF4Nsdg%3D%3D';
+var queryParams = '?' + encodeURIComponent('ServiceKey') + '=#';
 queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('1'); /* 한 페이지 결과 수 */
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /* 페이지 번호 */
 queryParams += '&' + encodeURIComponent('stationName') + '=' + encodeURIComponent(location); /* 측정소 이름 */
