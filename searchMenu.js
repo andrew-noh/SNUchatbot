@@ -1,8 +1,7 @@
 // Temporary variables
 var temp_date = '오늘';
-var temp_store = '서당골(4식당)';
+var temp_store = '학생회관 식당';
 
-// Temporary variables
 if (temp_date === '오늘') {
   var requestDate = 'today';
 } else {
@@ -193,44 +192,55 @@ function removeDuplicated(source_text) {
   return array.join('\n');
 }
 
-var dateReq = formatDate(requestDate);
 
-//Query
-var queryObject = {
-  //type: "cafeteria",
-  date: dateReq //Date
+function receiveMenu(body_raw) {
+  var body = JSON.parse(body_raw);
+  if (body.store.menus.length > 0) {
+    body.store.menus.forEach(function(value) {
+        delete value.type;
+        delete value.date;
+        if (value.description === '#' || !value.description) {
+          delete value.description;
+        };
+        if (value.name === '#' || !value.name) {
+          delete value.name;
+        };
+      });
+    return menuPresenter(body.store.menus);
+    } else {
+      return '메뉴가 업로드되지 않았습니다ㅠ';
+    };
 }
 
-//API Access token
-let req = request.defaults({
-  headers: {
-    'Accesstoken': '#'
-  }
-});
 
-req({
-  uri: 'https://bablabs.com/openapi/v1/campuses/spgIiBzSj0/stores/' + storeTag,
-  qs: queryObject,
-}, function(err, res, body) {
-  if (err) {
-    context.session.result = err.message;
-  } else {
-    body = JSON.parse(body);
-    body.store.menus.forEach(function(value) {
-      delete value.type;
-      delete value.date;
-      if (value.description === '#' || !value.description) {
-        delete value.description;
-      }
-      if (value.name === '#' || !value.name) {
-        delete value.name;
-      }
-    });
+  var dateReq = formatDate(requestDate);
 
-    //context.session.result = searchQuery + '\n' + stringDate(requestDate) + '\n' + menuPresenter(body.store.menus);
-    console.log(searchQuery + '\n' + stringDate(requestDate) + '\n' + menuPresenter(body.store.menus));
+  //Query
+  var queryObject = {
+    //type: "cafeteria",
+    date: dateReq //Date
   }
 
-  //callback();
+  //API Access token
+  let req = request.defaults({
+    headers: {
+      'Accesstoken': '#'
+    }
+  });
 
-});
+  req({
+    uri: 'https://bablabs.com/openapi/v1/campuses/spgIiBzSj0/stores/' + storeTag,
+    qs: queryObject,
+  }, function(err, res, body) {
+    if (err) {
+      //context.session.result = err.message;
+      console.log(err.message);
+    } else {
+      var outputText = searchQuery + '\n' + stringDate(requestDate) + '\n' + receiveMenu(body);
+      console.log(outputText);
+      //context.session.result = searchQuery + '\n' + stringDate(requestDate) + '\n' + receiveMenu(body);
+    }
+
+    //callback();
+
+  });
