@@ -26,9 +26,11 @@ function checkStatus(pmVal) {
     return '보통';
   } else if (pmVal > 80 && pmVal <= 150) {
     return '나쁨';
-  } else {
+  } else if (pmVal > 150){
     return '매우 나쁨';
-  };
+  } else {
+    return '정보 없음';
+  }
 }
 
 function getMessage(value_string) {
@@ -44,6 +46,8 @@ function getMessage(value_string) {
         break;
     case "매우 나쁨":
         return "오늘은 미세먼지 상태가 매우 나쁨이야!! 마스크를 꼭 쓰고 나가게~\n"
+    default:
+        return "미세먼지 정보가 없다..\n"
     };
 }
 
