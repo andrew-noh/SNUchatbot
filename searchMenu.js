@@ -1,6 +1,6 @@
 // Temporary variables
 var temp_date = '오늘';
-var temp_store = '학생회관 식당';
+var temp_store = '감골식당';
 
 if (temp_date === '오늘') {
   var requestDate = 'today';
@@ -14,7 +14,7 @@ var searchQuery = temp_store // User input query preset
 
 // Get dependency
 var request = require('request');
-
+var cheerio = require('cheerio');
 
 // Chatbot variables
 /*
@@ -192,7 +192,6 @@ function removeDuplicated(source_text) {
   return array.join('\n');
 }
 
-
 function receiveMenu(body_raw) {
   var body = JSON.parse(body_raw);
   if (body.store.menus.length > 0) {
@@ -212,12 +211,65 @@ function receiveMenu(body_raw) {
     };
 }
 
+function formatDate_Gamgol(todayOrTomorrow) {
+  var d = new Date();
+  var d2 = new Date(d.getTime() + 0); // +32400000;
+  var dPlus2 = new Date(d2.getTime() + 86400000);
+
+  var day = d2.getDate();
+  var tomorrow = dPlus2.getDate();
+  var month = d2.getMonth() + 1;
+  var year = d2.getFullYear();
+
+  if (todayOrTomorrow === 'today') {
+    return year + '-' + month + '-' + day;
+  } else if (todayOrTomorrow === 'tomorrow') {
+    return year + '-' + month + '-' + tomorrow;
+  } else {
+    return year + '-' + month + '-' + day;
+  };
+}
+
+function checkGamgolRestaurant(raw_string) {
+  //Check if right restaurant
+  if (raw_string.slice(0, 4) == '감골식당') {
+    return true;
+  } else {
+    return false;
+  };
+}
+
+function getGamgolMenu(html_menu) {
+  var menu_preprocess_1 = html_menu.replace(/-|-/g, '');
+  var menu_preprocess_2 = menu_preprocess_1.replace(/\n|,/g, ' ');
+  var menu_preprocess_3 = menu_preprocess_2.replace('감골식당', '');
+  var menu_preprocess_4 = menu_preprocess_3.replace(/ +(?= )/g, '');
+  var menu_preprocess_5 = menu_preprocess_4.slice(1);
+  var menu_list = menu_preprocess_5.split(' ');
+
+  for (i = 0; i < menu_list.length; i++) {
+    if (menu_list[i].match(/^\d\d/)) {
+      var price = menu_list[i].slice(0, 2) + '00원';
+      var menu_name = menu_list[i].slice(2);
+      var final_menu = menu_name + ' (' + price + ')';
+      menu_list[i] = final_menu;
+    }
+    if (menu_list[i] == 'ⓚ채식') {
+      menu_list[i] = 'ⓚ채식: 5000원';
+    }
+  };
+
+  var gamgol_menu = menu_list.join('\n');
+  return gamgol_menu;
+}
+
+// Check if request for Gamgol
+if (temp_store != '감골식당') {
 
   var dateReq = formatDate(requestDate);
 
   //Query
   var queryObject = {
-    //type: "cafeteria",
     date: dateReq //Date
   }
 
@@ -235,12 +287,54 @@ function receiveMenu(body_raw) {
     if (err) {
       //context.session.result = err.message;
       console.log(err.message);
+
     } else {
+      //context.session.result = searchQuery + '\n' + stringDate(requestDate) + '\n' + receiveMenu(body);
+
       var outputText = searchQuery + '\n' + stringDate(requestDate) + '\n' + receiveMenu(body);
       console.log(outputText);
-      //context.session.result = searchQuery + '\n' + stringDate(requestDate) + '\n' + receiveMenu(body);
     }
 
     //callback();
 
   });
+} else {
+
+  var url_gamgol = 'http://mini.snu.kr/cafe/set/';
+  var gamgol_day_request = formatDate_Gamgol(temp_date);
+  var url_day_gamgol = url_gamgol + gamgol_day_request;
+
+  request({
+    method: 'POST',
+    url: url_day_gamgol
+  }, function(err, res, body) {
+    if (err) return console.error(err);
+
+    let menu_data_gamgol = cheerio.load(body);
+
+    //Check if right restaurant
+    if (checkGamgolRestaurant(menu_data_gamgol('table tr:nth-child(11)').text()) === true) {
+      var gamgol_menu_final = menu_data_gamgol('table tr:nth-child(11)').text();
+      var gamgol_menu_text = searchQuery + '\n' + stringDate(requestDate) + '\n' + getGamgolMenu(gamgol_menu_final);
+
+      console.log(gamgol_menu_text);
+      //context.session.result = gamgol_menu_text;
+
+    } else if (checkGamgolRestaurant(menu_data_gamgol('table tr:nth-child(10)').text()) === true) {
+      var gamgol_menu_final = menu_data_gamgol('table tr:nth-child(10)').text();
+      var gamgol_menu_text = searchQuery + '\n' + stringDate(requestDate) + '\n' + getGamgolMenu(gamgol_menu_final);
+
+      console.log(gamgol_menu_text);
+      //context.session.result = gamgol_menu_text;
+
+    } else {
+
+      console.log('메뉴가 없습니다.');
+      console.log(gamgol_menu_raw);
+      //context.session.result = '메뉴가 없습니다.';
+    };
+
+    //callback();
+
+  });
+};
