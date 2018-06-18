@@ -260,7 +260,7 @@ function getGamgolMenu(html_menu) {
 }
 
 // Check if request for Gamgol
-if (temp_store != '감골식당') {
+if (searchQuery != '감골식당') {
 
   var dateReq = formatDate(requestDate);
 
