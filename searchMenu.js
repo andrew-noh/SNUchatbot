@@ -301,7 +301,7 @@ if (temp_store != '감골식당') {
 } else {
 
   var url_gamgol = 'http://mini.snu.kr/cafe/set/';
-  var gamgol_day_request = formatDate_Gamgol(temp_date);
+  var gamgol_day_request = formatDate_Gamgol(requestDate);
   var url_day_gamgol = url_gamgol + gamgol_day_request;
 
   request({
