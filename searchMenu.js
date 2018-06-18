@@ -52,9 +52,7 @@ var storeTag = storesDict[searchQuery];
 //Functions
 function formatDate(todayOrTomorrow) {
   var d = new Date();
-  //var timezoneOffset = d.getTimezoneOffset() * 60000;
   var today = new Date(d.getTime() + 32400000);
-  //var today = new Date(d.getTime() - timezoneOffset);
   var day = ("0" + today.getDate()).slice(-2);
   var dPlus2 = new Date(today.getTime() + 86400000);
   var tomorrow = ("0" + dPlus2.getDate()).slice(-2);
@@ -71,9 +69,7 @@ function formatDate(todayOrTomorrow) {
 
 function stringDate(todayOrTomorrow) {
   var d = new Date();
-  //var timezoneOffset = d.getTimezoneOffset() * 60000;
   var today = new Date(d.getTime() + 32400000);
-  //var today = new Date(d.getTime() - timezoneOffset);
   var day = ("0" + today.getDate()).slice(-2);
   var dPlus2 = new Date(today.getTime() + 86400000);
   var tomorrow = ("0" + dPlus2.getDate()).slice(-2);
@@ -213,13 +209,13 @@ function receiveMenu(body_raw) {
 
 function formatDate_Gamgol(todayOrTomorrow) {
   var d = new Date();
-  var d2 = new Date(d.getTime() + 0); // +32400000;
-  var dPlus2 = new Date(d2.getTime() + 86400000);
+  var today = new Date(d.getTime() + 32400000); // +32400000;
+  var dPlus2 = new Date(today.getTime() + 86400000);
 
-  var day = d2.getDate();
+  var day = today.getDate();
   var tomorrow = dPlus2.getDate();
-  var month = d2.getMonth() + 1;
-  var year = d2.getFullYear();
+  var month = today.getMonth() + 1;
+  var year = today.getFullYear();
 
   if (todayOrTomorrow === 'today') {
     return year + '-' + month + '-' + day;
@@ -255,7 +251,7 @@ function getGamgolMenu(html_menu) {
       menu_list[i] = final_menu;
     }
     if (menu_list[i] == 'ⓚ채식') {
-      menu_list[i] = 'ⓚ채식: 5000원';
+      menu_list[i] = 'ⓚ채식 (5000원)';
     }
   };
 
