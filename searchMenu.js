@@ -251,7 +251,7 @@ function getGamgolMenu(html_menu) {
       menu_list[i] = final_menu;
     }
     if (menu_list[i] == 'ⓚ채식') {
-      menu_list[i] = 'ⓚ채식 (5000원)';
+      menu_list[i] = 'ⓚ채식 (6500원)';
     }
   };
 
